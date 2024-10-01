@@ -2,7 +2,7 @@ import axios from "axios";
 
 export async function fetchImages(inputValue, page, limit) {
     try {
-        const response = await axios.get(`https://pixabay.com/api`, {
+        const response = await axios.get(`https://pixabay.com/api/?`, {
             params: {
                 key: '46126545-8899f9a6fbc888edd135bf332',
                 q: inputValue,
