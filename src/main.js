@@ -67,16 +67,17 @@ async function loadImages() {
 
         scroll();
 
-        if (page < totalPages) {
-            btn.style.display = 'block';
-        } else {
+        if (images.length < limit || page >= totalPages) {
+            btn.style.display = 'none';
             iziToast.show({
                 message: "We're sorry, but you've reached the end of search results.",
                 color: "red",
                 position: "topRight",
             });
-            btn.style.display = 'none';
+        } else {
+            btn.style.display = 'block';
         }
+
     } catch (error) {
         iziToast.show({
             message: "We're sorry, but you've reached the end of search results.",
@@ -84,6 +85,7 @@ async function loadImages() {
             position: "topRight",
         });
         btn.style.display = 'none';
+        
     } finally {
         loader.style.display = 'none';
     }
