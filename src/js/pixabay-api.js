@@ -1,7 +1,6 @@
 import axios from "axios";
 
 export async function fetchImages(inputValue, page, limit) {
-    try {
         const searchParams = new URLSearchParams({
             key: '46126545-8899f9a6fbc888edd135bf332',
             q: inputValue,
@@ -15,8 +14,4 @@ export async function fetchImages(inputValue, page, limit) {
         const response = await axios.get(`https://pixabay.com/api/?${searchParams}`);
 
         return response.data.hits;
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }    
-}
+};
