@@ -1,3 +1,100 @@
-import "./js/pixabay-api";
-import "./js/render-functions";
+import { fetchImages } from "./js/pixabay-api";
+import { renderImages } from "./js/render-functions";
 
+import iziToast from "izitoast";
+import "izitoast/dist/css/iziToast.min.css";
+
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
+
+const form = document.querySelector('.search-form');
+export const gallery = document.querySelector('.image-gallery');
+const btn = document.querySelector(`.load-more`);
+const loader = document.querySelector('.loader');
+
+let lightbox = new SimpleLightbox('.image-gallery a', {
+    captionsData: 'alt',
+    captionDelay: 250,
+});
+
+let page = 1;
+let limit = 15;
+let currentQuery = "";
+const totalPages = Math.ceil(500 / limit);
+
+form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const inputValue = form.elements.query.value.trim();
+
+    if (!inputValue) {
+        iziToast.show({
+            message: 'Please enter a search query.',
+            color: 'red',
+            position: 'topRight',
+        });
+        return;
+    }
+
+    currentQuery = inputValue;
+    page = 1;
+    gallery.innerHTML = '';
+
+    loadImages();
+});
+
+async function loadImages() {
+    loader.style.display = 'block';
+    try {
+        const images = await fetchImages(currentQuery, page, limit);
+
+        if (images.length === 0 && page === 1) {
+            iziToast.show({
+                message: `Sorry, there are no images matching your search query. Please try again!`,
+                color: 'red',
+                position: 'topRight',
+            });
+            gallery.innerHTML = '';
+            return;
+        }
+
+        renderImages(images);
+
+        lightbox.refresh();
+
+        scroll();
+
+        if (page < totalPages) {
+            btn.style.display = 'block';
+        } else {
+            btn.style.display = 'none';
+            iziToast.show({
+                message: "We're sorry, but you've reached the end of search results.",
+                color: "red",
+                position: "topRight",
+            });
+        }
+    } catch (error) {
+        iziToast.show({
+            message: "We're sorry, but you've reached the end of search results.",
+            color: "red",
+            position: "topRight",
+        });
+    } finally {
+        loader.style.display = 'none';
+    }
+}
+
+btn.addEventListener("click", () => {
+    page += 1;
+    loadImages();
+});
+
+function scroll() {
+    const card = document.querySelector('.gallery-item');
+    const cardHeight = card.getBoundingClientRect().height;
+    window.scrollBy({
+        top: cardHeight * 2,
+        behavior: 'smooth',
+    });
+};
